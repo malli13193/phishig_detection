@@ -1,0 +1,45 @@
+import re
+from email import message_from_string
+import smtplib
+
+# Sample email content
+email_content = """From: spoofed@phishing.com
+To: victim@example.com
+Subject: Urgent: Account Security Alert
+
+Dear user,
+
+Click on the link below to verify your account:
+http://phishinglink.com/verify
+
+Best regards,
+Support Team
+"""
+
+# Function to detect suspicious links
+def detect_suspicious_links(email_content):
+    suspicious_links = re.findall(r'http[s]?://[^\s]+', email_content)
+    return suspicious_links
+
+# Function to detect spoofed domains
+def detect_spoofed_domains(email_content):
+    from_address = re.findall(r'From: (.+)', email_content)
+    if from_address:
+        domain = from_address[0].split('@')[-1]
+        # List of known good domains
+        valid_domains = ['example.com']
+        if domain not in valid_domains:
+            return domain
+    return None
+
+# Process the email content
+suspicious_links = detect_suspicious_links(email_content)
+spoofed_domain = detect_spoofed_domains(email_content)
+
+# Decision to block the email
+if suspicious_links or spoofed_domain:
+    print("Phishing detected!")
+    # Code to block email or flag for further action
+else:
+    print("Email is safe.")
+
